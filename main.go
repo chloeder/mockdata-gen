@@ -53,10 +53,24 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Validate the type
 	if err := validateType(mapping); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(0)
 	}
+
+	//	Generate the output file
+	result, err := generateOutput(mapping)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(0)
+	}
+
+	if err := writeOutput(outputPath, result); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(0)
+	}
+
 }
 
 func printUsage() {
@@ -140,6 +154,42 @@ func validateType(mapping map[string]string) error {
 		if !supported[value] {
 			return errors.New("unsupported type")
 		}
+	}
+
+	return nil
+}
+
+func generateOutput(mapping map[string]string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	for key, dataType := range mapping {
+		result[key] = fmt.Sprintf("%s palsu", dataType)
+	}
+	return result, nil
+}
+
+func writeOutput(path string, result map[string]string) error {
+	if path == "" {
+		return errors.New("path is empty")
+	}
+
+	// Flag for read and write, create if not exist, truncate if exist
+	flags := os.O_RDWR | os.O_CREATE | os.O_TRUNC // READ AND WRITE | CREATE IF NOT EXIST | TRUNCATE IF EXIST
+	file, err := os.OpenFile(path, flags, 0644)   // 0644 = rw-r--r-- = owner read write, group read, other read
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Marshal the result with indent
+	resultBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	// Write the result to the file
+	if _, err := file.Write(resultBytes); err != nil {
+		return err
 	}
 
 	return nil
