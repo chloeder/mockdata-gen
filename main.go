@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"mockdata-gen/data"
 )
 
 func main() {
@@ -143,15 +145,8 @@ func readInput(path string, mapping *map[string]string) error {
 }
 
 func validateType(mapping map[string]string) error {
-	supported := map[string]bool{
-		"name":      true,
-		"birthdate": true,
-		"address":   true,
-		"phone":     true,
-	}
-
 	for _, value := range mapping {
-		if !supported[value] {
+		if !data.Supported[value] {
 			return errors.New("unsupported type")
 		}
 	}
@@ -163,7 +158,7 @@ func generateOutput(mapping map[string]string) (map[string]string, error) {
 	result := make(map[string]string)
 
 	for key, dataType := range mapping {
-		result[key] = fmt.Sprintf("%s palsu", dataType)
+		result[key] = data.Generator(dataType)
 	}
 	return result, nil
 }
