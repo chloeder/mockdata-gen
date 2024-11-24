@@ -24,7 +24,7 @@ jobs:
     - name: Linter
       uses: golangci/golangci-lint-action@v6.1.1
       with: 
-        version: '1.58'
+        version: 1.58
       
     - name: Vulnerability Check
       uses: golang/govulncheck-action@v1
